@@ -1,0 +1,12 @@
+create database empresa;
+
+use empresa;
+
+create table produtos (
+		codigo varchar(100) primary key not null,
+        produto varchar(100),
+        data_validade varchar(100),
+        preco decimal
+)
+
+select * from produtos;
