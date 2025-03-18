@@ -1,65 +1,55 @@
 <?php
-class validarCPF
-{
-  public static function blacklist($cpfBase){
-    $arquivo = 'blacklist.json';
-    if(!file_exists($arquivo)){
-      file_put_contents($arquivo, json_encode(["blacklist" => ["cpfs" => []]], JSON_PRETTY_PRINT));
-    }
-    $dados = json_decode(file_get_contents($arquivo), true);
-    $cpfBase = self::removePontuacao($cpfBase);
-    if (in_array($cpfBase, $dados["blacklist"]["cpfs"])) {
-      return true;
-    }
+  class validarCPF {
+    public static function removePontuacao($cpf){
+      $remover = array(".", ",", "!", "?", ";", ":", "-");
+      return str_replace($remover, '', $cpf);
+    } 
+    public static function validador($cpf){
+      //Recebe o CPF sem pontuação
+      $cpf_F = self::removePontuacao($cpf);
+      
+      $cpf = substr($cpf_F, 0, -2);
 
-    $dados["blacklist"]["cpfs"][] = $cpfBase;
-    file_put_contents($arquivo, json_encode($dados, JSON_PRETTY_PRINT));
-    return false;
+      // mult seria os valores pelos quais o cpf é multiplicado, nesse caso seria de 2 a 10, dessa fora no loop, multiplicaria de 2 a 10 com os digitos do cpf da esquerda para a direita.
+      $mult = 2;
+      $total = 0;
+      $digitoVerificador1 = 0;
+      $digitoVerificador2 = 0;
+      
+      //echo $cpf;
 
-  }
-  private static function removePontuacao($cpf)
-  {
-    $remover = array(".", ",", "!", "?", ";", ":", "-");
-    return str_replace($remover, '', $cpf);
-  }
+      for ($i=strlen($cpf)-1; $i >= 0; $i--) { 
+        $total += $cpf[$i] * $mult;
+        $mult++;
+      }
+      
+      //Cálculo do primeiro dígito
+      $resto = $total % 11;
+      if ($resto >= 2) {
+        $digitoVerificador1 = 11 - $resto;
+      }
+      $cpf .= $digitoVerificador1;
 
-  private static function calculaDigitos($cpf, $mult)
-  {
-    $total = 0;
-    for ($i = strlen($cpf) - 1; $i >= 0; $i--) {
-      $total += $cpf[$i] * $mult;
-      $mult++;
-    }
-    return $total % 11;
-  }
+      //Cálculo segundo dígito
+      $total = 0;
+      $mult = 2;
+      for ($i = strlen($cpf) - 1; $i >= 0 ; $i--) { 
+        $total += $cpf[$i] * $mult;
+        $mult++;
+      }
+      $resto = $total % 11;
+      if ($resto >= 2) {
+        $digitoVerificador2 = 11 - $resto;
+      }
 
-  private static function calculaDigitosVerificadores($cpfBase){ 
-
-    $digito1 = self::calculaDigitos($cpfBase, 2);
-    $digitoVerificador1 = ($digito1 >= 2) ? 11 - $digito1 : 0;
-
-    $cpfBase .= $digitoVerificador1;
-    $digito2 = self::calculaDigitos($cpfBase, 2);
-    $digitoVerificador2 = ($digito2 >= 2) ? 11 - $digito2 : 0;
-
-    return $digitoVerificador1 . $digitoVerificador2;
-  }
-
-  public static function validador($cpf){
-    $cpf = self::removePontuacao($cpf);
-    $cpfBase = substr($cpf, 0, -2);
-
-    if (self::blacklist($cpfBase)) {
-      return "CPF inválido (Blacklist)";
+      $digitoVerificador1 .= $digitoVerificador2;
+      if ($digitoVerificador1 == substr($cpf_F, -2)){
+        return "CPF Válido";
+      }else {
+        return "CPF inválido";
+      }
     }
 
-    $digitosVerificadores = self::calculaDigitosVerificadores($cpfBase);
-
-    if ($digitosVerificadores == substr($cpf, -2)) {
-      return "CPF Válido";
-    } else {
-      return "CPF inválido";
-    }
   }
-  
-}
+
+?>

@@ -11,8 +11,6 @@
     <input type="text" maxlenght="14" id="cpf" name="cpf" placeholder="000.000.000-00" onkeyup="this.value=FormatarCPF(this.value)">
     <br><br>
     <input type="submit" value="Enviar">
-    <input type="submit" name="blacklist" value="Adicionar na blacklist">
-    
     <br><br>
   </form>
 </body>
@@ -30,7 +28,5 @@
 <?php
   if (isset($cpfValidado)) {
     echo $cpfValidado;
-  }else if(isset($resultado)){
-    echo $resultado ? "CPF já estava adicionado na blacklist" : "CPF foi adicionado na Blacklist";
   }
 ?>
