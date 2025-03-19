@@ -10,7 +10,7 @@
     <label for="cpf">CPF:</label>
     <input type="text" maxlenght="14" id="cpf" name="cpf" placeholder="000.000.000-00" onkeyup="this.value=FormatarCPF(this.value)">
     <br><br>
-    <input type="submit" value="Enviar">
+    <input type="submit" name="enviar" value="Enviar">
     <input type="submit" name="blacklist" value="Adicionar na blacklist">
     
     <br><br>

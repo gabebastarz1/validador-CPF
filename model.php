@@ -1,7 +1,24 @@
 <?php
 class validarCPF
 {
-  public static function blacklist($cpfBase){
+
+  public static function blacklist($cpfInserido, $adicionar = false){
+    $arquivo = 'blacklist.json';
+    if(!file_exists($arquivo)){
+      file_put_contents($arquivo, json_encode(["blacklist" => ["cpfs" => []]], JSON_PRETTY_PRINT));
+    }
+    $dados = json_decode(file_get_contents($arquivo), true);
+    $cpfInserido = self::removePontuacao($cpfInserido);
+    if (in_array($cpfInserido, $dados["blacklist"]["cpfs"])) {
+      return true;
+    }
+    if($adicionar){
+      $dados["blacklist"]["cpfs"][] = $cpfInserido;
+      file_put_contents($arquivo, json_encode($dados, JSON_PRETTY_PRINT));
+    }
+    
+  }
+  /*public static function blacklist($cpfBase){
     $arquivo = 'blacklist.json';
     if(!file_exists($arquivo)){
       file_put_contents($arquivo, json_encode(["blacklist" => ["cpfs" => []]], JSON_PRETTY_PRINT));
@@ -10,13 +27,14 @@ class validarCPF
     $cpfBase = self::removePontuacao($cpfBase);
     if (in_array($cpfBase, $dados["blacklist"]["cpfs"])) {
       return true;
+    }else{
+      $dados["blacklist"]["cpfs"][] = $cpfBase;
+      file_put_contents($arquivo, json_encode($dados, JSON_PRETTY_PRINT));
+      return false;
     }
 
-    $dados["blacklist"]["cpfs"][] = $cpfBase;
-    file_put_contents($arquivo, json_encode($dados, JSON_PRETTY_PRINT));
-    return false;
 
-  }
+  }*/
   private static function removePontuacao($cpf)
   {
     $remover = array(".", ",", "!", "?", ";", ":", "-");
@@ -45,7 +63,7 @@ class validarCPF
     return $digitoVerificador1 . $digitoVerificador2;
   }
 
-  public static function validador($cpf){
+  /*public static function validador($cpf){
     $cpf = self::removePontuacao($cpf);
     $cpfBase = substr($cpf, 0, -2);
 
@@ -60,6 +78,19 @@ class validarCPF
     } else {
       return "CPF inválido";
     }
+  }*/
+  public static function validador($cpf){
+    $cpf = self::removePontuacao($cpf);
+    $cpfBase = substr($cpf, 0, -2);
+    $cpfInserido=$cpf;
+    $verificaBlacklist = self::blacklist($cpfInserido);
+
+    $digitosVerificadores = self::calculaDigitosVerificadores($cpfBase);
+
+    if ($digitosVerificadores == substr($cpf, -2) && $verificaBlacklist == !true) {
+      return "CPF Válido";
+    } else {
+      return "CPF inválido";
+    }
   }
-  
 }
