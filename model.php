@@ -18,23 +18,6 @@ class validarCPF
     }
     
   }
-  /*public static function blacklist($cpfBase){
-    $arquivo = 'blacklist.json';
-    if(!file_exists($arquivo)){
-      file_put_contents($arquivo, json_encode(["blacklist" => ["cpfs" => []]], JSON_PRETTY_PRINT));
-    }
-    $dados = json_decode(file_get_contents($arquivo), true);
-    $cpfBase = self::removePontuacao($cpfBase);
-    if (in_array($cpfBase, $dados["blacklist"]["cpfs"])) {
-      return true;
-    }else{
-      $dados["blacklist"]["cpfs"][] = $cpfBase;
-      file_put_contents($arquivo, json_encode($dados, JSON_PRETTY_PRINT));
-      return false;
-    }
-
-
-  }*/
   private static function removePontuacao($cpf)
   {
     $remover = array(".", ",", "!", "?", ";", ":", "-");
@@ -63,22 +46,6 @@ class validarCPF
     return $digitoVerificador1 . $digitoVerificador2;
   }
 
-  /*public static function validador($cpf){
-    $cpf = self::removePontuacao($cpf);
-    $cpfBase = substr($cpf, 0, -2);
-
-    if (self::blacklist($cpfBase)) {
-      return "CPF inválido (Blacklist)";
-    }
-
-    $digitosVerificadores = self::calculaDigitosVerificadores($cpfBase);
-
-    if ($digitosVerificadores == substr($cpf, -2)) {
-      return "CPF Válido";
-    } else {
-      return "CPF inválido";
-    }
-  }*/
   public static function validador($cpf){
     $cpf = self::removePontuacao($cpf);
     $cpfBase = substr($cpf, 0, -2);
